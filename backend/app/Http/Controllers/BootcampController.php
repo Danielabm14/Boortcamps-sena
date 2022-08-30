@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Bootcamp;
+
 
 class BootcampController extends Controller
 {
@@ -13,7 +15,10 @@ class BootcampController extends Controller
      */
     public function index()
     {
-        echo "Aqui se va a mostrar todos los bootcamp";
+        //echo "Aqui se va a mostrar todos los bootcamp";
+      return response()->json(["success"=> true,     
+                                "data" => Bootcamp::all()
+                              ], 200);
     }
 
     /**
@@ -24,8 +29,24 @@ class BootcampController extends Controller
      */
     public function store(Request $request)
     {
-        echo "Aqui se crea un bootcamp";
+       
+        //registrar el bootcamp a partir de paylod
+       
+           $newBootcamp = new Bootcamp();
+           $newBootcamp->name =$request->input("name"); 
+           $newBootcamp->description =$request->input("description"); 
+           $newBootcamp->website =$request->input("website"); 
+           $newBootcamp->phone =$request->input("phone"); 
+           $newBootcamp->user_id =$request->input("user_id"); 
+           $newBootcamp->save();
+    
+           return $newBootcamp;
+
+           return response(["succes" => true,
+                            "data"=> $b], 201);
     }
+    
+    
 
     /**
      * Display the specified resource.
@@ -35,7 +56,9 @@ class BootcampController extends Controller
      */
     public function show($id)
     {
-        echo "Mostrar un bootcamp cuyo id es: $id";
+        return response()->json(["success"=> true,     
+        "data" => Bootcamp::find($id)
+      ], 200);
     }
 
     /**
@@ -47,7 +70,17 @@ class BootcampController extends Controller
      */
     public function update(Request $request, $id)
     {
-        echo "Aqui se va a actualizar el bootcamp con id : $id";
+        //1. seleccionar el bootcamp por id
+        $bootcamp = Bootcamp::find($id);
+        //2.actualizarlo
+        $bootcamp->update(
+            $request->all()
+         );
+        //3.hacer el response respectivo
+         return response()->json(["success"=> true,
+                                    "data"=> $bootcamp
+                                 ],200);
+
     }
 
     /**
@@ -58,6 +91,14 @@ class BootcampController extends Controller
      */
     public function destroy($id)
     {
-        echo "Aqui se va a eliminat el bootcamp cuyo id es : $id";
+       //1. selecciona el bootcamp
+       $bootcamp = Bootcamp::find($id);
+        //2.elminar bootcamp
+        $bootcamp->delete();
+        //3. response:
+        return response()->json(["success" => true,
+                                "message" => "Bootcamp Eliminado",
+                                "data" => $bootcamp->id], 200);
+
     }
 }
