@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Bootcamp;
+use Illuminate\Support\Facades\Validator;
+use App\Http\requests\StoreBootcampRequest;
+use App\Http\Resources\BootcampResource;
+use App\Http\Resources\BootcampCollection;
 
 
 class BootcampController extends Controller
@@ -16,9 +20,7 @@ class BootcampController extends Controller
     public function index()
     {
         //echo "Aqui se va a mostrar todos los bootcamp";
-      return response()->json(["success"=> true,     
-                                "data" => Bootcamp::all()
-                              ], 200);
+      return response()->json( new BootcampCollection(Bootcamp::all()) ,200);
     }
 
     /**
@@ -27,23 +29,35 @@ class BootcampController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreBootcampRequest $request)
     {
        
-        //registrar el bootcamp a partir de paylod
-       
-           $newBootcamp = new Bootcamp();
-           $newBootcamp->name =$request->input("name"); 
-           $newBootcamp->description =$request->input("description"); 
-           $newBootcamp->website =$request->input("website"); 
-           $newBootcamp->phone =$request->input("phone"); 
-           $newBootcamp->user_id =$request->input("user_id"); 
-           $newBootcamp->save();
-    
-           return $newBootcamp;
+  
+        // 2. crear el objeto validador 
 
-           return response(["succes" => true,
-                            "data"=> $b], 201);
+        $v = validator::make($request->all(), $reglas);
+        if($v->fails()){
+          // Si la validacion falla
+          //enviar response de error (postman)
+
+          return response()->json([
+                                "success" => false,
+                                "errors" => $v->errors()
+          ], 422); 
+
+        }
+
+
+
+      //registrar el bootcamp a partir de paylod
+       
+
+        $b = bootcamp::create(
+          $request->all()
+        );
+        return response (["success" => true,
+                            "data" => $b], 201);
+    
     }
     
     
@@ -57,7 +71,7 @@ class BootcampController extends Controller
     public function show($id)
     {
         return response()->json(["success"=> true,     
-        "data" => Bootcamp::find($id)
+        "data" => new BootcampResource (Bootcamp::find($id))
       ], 200);
     }
 
@@ -78,7 +92,7 @@ class BootcampController extends Controller
          );
         //3.hacer el response respectivo
          return response()->json(["success"=> true,
-                                    "data"=> $bootcamp
+                                    "data"=> new BootcampResource($bootcamp)
                                  ],200);
 
     }
@@ -98,7 +112,7 @@ class BootcampController extends Controller
         //3. response:
         return response()->json(["success" => true,
                                 "message" => "Bootcamp Eliminado",
-                                "data" => $bootcamp->id], 200);
+                                "data" => new BootcampResource($bootcamp)], 200);
 
     }
 }
