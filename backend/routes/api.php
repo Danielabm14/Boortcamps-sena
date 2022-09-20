@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BootcampController;
+use App\Http\Controllers\CoursesController;
+use App\Http\Controllers\ReviewsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,4 +21,19 @@ use App\Http\Controllers\BootcampController;
 });*/
 
 Route::apiResource('bootcamps', BootcampController::class);
+Route::apiResource('courses', CoursesController::class );
+Route::apiResource('reviews', ReviewsController::class );
+
+//Ruta especifica para crear un curso a un boot
+
+Route::post("courses/{idbootcamp}/create", 
+                [CoursesController::class, "store"]    
+           );
+
+
+//Ruta especifica para crear una review a un boot
+
+Route::post("reviews/{idbootcamp}/create", 
+                [ReviewsController::class, "store"]    
+           );
 
